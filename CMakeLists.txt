@@ -34,3 +34,8 @@ set_property(CACHE CXX_COMPILE_FEATURE_TYPE
 
 add_subdirectory(src)
 
+option(BUILD_EXAMPLES "Enable build examples" ON)
+if(BUILD_EXAMPLES)
+    add_subdirectory(examples)
+endif()
+
