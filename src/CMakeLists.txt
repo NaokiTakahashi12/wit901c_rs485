@@ -51,9 +51,50 @@ set_target_properties(${WIT901C_RS485_LIB}
         VERSION ${PROJECT_VERSION}
         OUTPUT_NAME ${WIT901C_RS485_LIB}
         POSITION_INDEPENDENT_CODE ON
-        ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}
-        LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}
 )
+if(ament_cmake_FOUND)
+    ament_export_libraries(${WIT901C_RS485_LIB})
+else()
+    set_target_properties(${WIT901C_RS485_LIB}
+        PROPERTIES
+            ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}
+            LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}
+    )
+endif()
+
+if(ament_cmake_FOUND)
+    set(IMU_NODE imu_node)
+    find_package(rclcpp REQUIRED)
+    find_package(sensor_msgs REQUIRED)
+    find_package(geometry_msgs REQUIRED)
+    add_executable(${IMU_NODE}
+        ${CMAKE_CURRENT_SOURCE_DIR}/imu_node.cpp
+    )
+    target_compile_features(${IMU_NODE}
+        PRIVATE
+            ${CXX_COMPILE_FEATURE_TYPE}
+    )
+    target_compile_options(${IMU_NODE}
+        PRIVATE
+            -Wall -Winline -Wextra -pedantic
+    )
+    ament_target_dependencies(${IMU_NODE}
+        rclcpp
+        sensor_msgs
+        geometry_msgs
+    )
+    target_link_libraries(${IMU_NODE}
+        ${WIT901C_RS485_LIB}
+    )
+    set_target_properties(${IMU_NODE}
+        PROPERTIES
+            VERSION ${PROJECT_VERSION}
+            OUTPUT_NAME ${IMU_NODE}
+    )
+    install(TARGETS ${IMU_NODE}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_LIBDIR}/${PROJECT_NAME}
+   )
+endif()
 
 set(CONFIG_DIR Wit901cRs485)
 set(CONFIG_NAME ${CONFIG_DIR}Config)
