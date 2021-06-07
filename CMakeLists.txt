@@ -32,10 +32,17 @@ set_property(CACHE CXX_COMPILE_FEATURE_TYPE
             cxx_std_98
 )
 
+find_package(ament_cmake QUIET)
+
 add_subdirectory(src)
 
 option(BUILD_EXAMPLES "Enable build examples" ON)
 if(BUILD_EXAMPLES)
     add_subdirectory(examples)
+endif()
+
+if(ament_cmake_FOUND)
+    ament_export_include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
+    ament_package()
 endif()
 
